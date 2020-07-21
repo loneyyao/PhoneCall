@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="tab_indicator">
+        <attr name="tab_indicator_image_src" format="reference" />
+        <attr name="tab_indicator_text_string" format="reference|string" />
+        <attr name="tab_indicator_textSize" format="dimension" />
+        <attr name="tab_indicator_imageSize" format="dimension" />
+        <attr name="tab_indicator_textColor" format="color" />
+        <attr name="tab_indicator_isMainPage" format="boolean" />
+
+    </declare-styleable>
+
+</resources>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+
+    <com.ajiew.phonecallapp.NoScrollViewPager
+        android:id="@+id/main_viewpager"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
+
+    <LinearLayout
+        android:id="@+id/main_tab"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true"
+        android:background="@android:color/darker_gray"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <com.ajiew.phonecallapp.TabIndicatorItemView
+            android:id="@+id/tab_home"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:onClick="onTabIndicatorItemClick"
+            app:tab_indicator_image_src="@drawable/chuck_ic_delete_white_24dp"
+            app:tab_indicator_text_string="首页" />
+
+        <com.ajiew.phonecallapp.TabIndicatorItemView
+            android:id="@+id/tab_shopcar"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:onClick="onTabIndicatorItemClick"
+            app:tab_indicator_image_src="@drawable/chuck_ic_delete_white_24dp"
+            app:tab_indicator_text_string="骚扰设置"/>
+
+        <com.ajiew.phonecallapp.TabIndicatorItemView
+            android:id="@+id/tab_mine"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:onClick="onTabIndicatorItemClick"
+            app:tab_indicator_image_src="@drawable/chuck_ic_delete_white_24dp"
+            app:tab_indicator_text_string="阻止列表" />
+
+    </LinearLayout>
+</LinearLayout>
