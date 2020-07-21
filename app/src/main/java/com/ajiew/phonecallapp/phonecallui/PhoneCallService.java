@@ -4,6 +4,7 @@ import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.telecom.Call;
 import android.telecom.InCallService;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.ajiew.phonecallapp.ActivityStack;
@@ -60,7 +61,6 @@ public class PhoneCallService extends InCallService {
 
             switch (state) {
                 case Call.STATE_ACTIVE: {
-
                     break;
                 }
 
@@ -81,28 +81,29 @@ public class PhoneCallService extends InCallService {
         PhoneCallManager.call = call;
 
         CallType callType = null;
-
-        if (call.getState() == Call.STATE_RINGING) {
-            callType = CallType.CALL_IN;
-
-
-            getPhoneAddressService.getUsers(call.getDetails().getHandle().getSchemeSpecificPart())
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new Consumer<CallAddress>() {
-                        @Override
-                        public void accept(CallAddress callAddress) throws Exception {
-                            Toast.makeText(PhoneCallService.this, callAddress.getResult().getAtt(), Toast.LENGTH_LONG).show();
-                            if (callAddress.getResult().getAtt().contains(keyWord)){
-                                manager.disconnect();
+        Log.d(TAG, "onCallAdded: callState"+call.getState());
+        switch (call.getState()) {
+            case Call.STATE_RINGING:
+                callType = CallType.CALL_IN;
+                getPhoneAddressService.getUsers(call.getDetails().getHandle().getSchemeSpecificPart())
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Consumer<CallAddress>() {
+                            @Override
+                            public void accept(CallAddress callAddress) throws Exception {
+                                Toast.makeText(PhoneCallService.this, callAddress.getResult().getAtt(), Toast.LENGTH_LONG).show();
+                                if (callAddress.getResult().getAtt().contains(keyWord)){
+                                    manager.disconnect();
+                                }
                             }
-                        }
-                    });
-
-        } else if (call.getState() == Call.STATE_CONNECTING) {
-            callType = CallType.CALL_OUT;
+                        });
+                break;
+            case Call.STATE_CONNECTING:
+                callType = CallType.CALL_OUT;
+                break;
+            default:
+                break;
         }
-
         if (callType != null) {
             Call.Details details = call.getDetails();
             String phoneNumber = details.getHandle().getSchemeSpecificPart();
