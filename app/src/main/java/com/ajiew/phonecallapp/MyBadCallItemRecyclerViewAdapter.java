@@ -14,49 +14,66 @@ import java.util.List;
  * {@link RecyclerView.Adapter} that can display a {@link DummyItem}.
  * TODO: Replace the implementation with code for your data type.
  */
-public class MyBadCallItemRecyclerViewAdapter extends RecyclerView.Adapter<MyBadCallItemRecyclerViewAdapter.ViewHolder> {
+public class MyBadCallItemRecyclerViewAdapter extends RecyclerView.Adapter<MyBadCallItemRecyclerViewAdapter.CallLogViewHolder> {
 
-    private final List<DummyItem> mValues;
+    private List<CallLog> mValues;
+    private ItemLongClickListener itemLongClickListener;
 
-    public MyBadCallItemRecyclerViewAdapter(List<DummyItem> items) {
-        mValues = items;
+    public MyBadCallItemRecyclerViewAdapter() {
+
+    }
+
+    public void setmValues(List<CallLog> mValues) {
+        this.mValues = mValues;
+        notifyDataSetChanged();
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public MyBadCallItemRecyclerViewAdapter.CallLogViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.fragment_bad_call_i_list, parent, false);
-        return new ViewHolder(view);
+                .inflate(R.layout.fragment_call_log_list_item, parent, false);
+        return new MyBadCallItemRecyclerViewAdapter.CallLogViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, int position) {
-        holder.mItem = mValues.get(position);
-        holder.mIdView.setText(mValues.get(position).id);
-        holder.mContentView.setText(mValues.get(position).content);
+    public void onBindViewHolder(final MyBadCallItemRecyclerViewAdapter.CallLogViewHolder holder, int position) {
+        CallLog callLog = mValues.get(position);
+        holder.call.setText(callLog.getCall());
+        holder.address.setText(callLog.getAddress());
+        holder.mView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                if (itemLongClickListener != null) {
+                    return itemLongClickListener.onLongClickListener(v, holder.getAdapterPosition());
+                }
+                return false;
+            }
+        });
     }
 
     @Override
     public int getItemCount() {
-        return mValues.size();
+        return mValues == null ? 0 : mValues.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
-        public final View mView;
-        public final TextView mIdView;
-        public final TextView mContentView;
-        public DummyItem mItem;
+    public ItemLongClickListener getItemLongClickListener() {
+        return itemLongClickListener;
+    }
 
-        public ViewHolder(View view) {
+    public void setItemLongClickListener(ItemLongClickListener itemLongClickListener) {
+        this.itemLongClickListener = itemLongClickListener;
+    }
+
+    public static class CallLogViewHolder extends RecyclerView.ViewHolder {
+        public final View mView;
+        public final TextView call;
+        public final TextView address;
+
+        public CallLogViewHolder(View view) {
             super(view);
             mView = view;
-            mIdView = (TextView) view.findViewById(R.id.item_number);
-            mContentView = (TextView) view.findViewById(R.id.content);
-        }
-
-        @Override
-        public String toString() {
-            return super.toString() + " '" + mContentView.getText() + "'";
+            call = (TextView) view.findViewById(R.id.call);
+            address = (TextView) view.findViewById(R.id.address);
         }
     }
 }

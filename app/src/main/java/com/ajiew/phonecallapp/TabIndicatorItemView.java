@@ -21,6 +21,7 @@ public class TabIndicatorItemView extends LinearLayout {
     private DraggableFlagView remindView;
     private boolean isUseCircleUnReadView = true;
     private boolean isMainPage = true;
+    private int textColor;
 
     public void setUseCircleUnReadView(boolean useCircleUnReadView) {
         isUseCircleUnReadView = useCircleUnReadView;
@@ -68,7 +69,8 @@ public class TabIndicatorItemView extends LinearLayout {
             indicatorTextView.setText(text);
             float textSize = attributes.getDimension(R.styleable.tab_indicator_tab_indicator_textSize, -1);
             float imgSize = attributes.getDimension(R.styleable.tab_indicator_tab_indicator_imageSize, -1);
-            int textColor = attributes.getColor(R.styleable.tab_indicator_tab_indicator_textColor, getContext().getResources().getColor(R.color.color_tab_indicator_text_normal));
+            textColor = attributes.getColor(R.styleable.tab_indicator_tab_indicator_textColor, getContext().getResources().getColor(R.color.color_tab_indicator_text_normal));
+            indicatorTextView.setTextColor(textColor);
             isMainPage = attributes.getBoolean(R.styleable.tab_indicator_tab_indicator_isMainPage, true);
             if (textSize != -1) {
                 indicatorTextView.setTextSize(textSize);
@@ -90,7 +92,7 @@ public class TabIndicatorItemView extends LinearLayout {
         if (selected && isMainPage) {
             indicatorTextView.setTextColor(getResources().getColor(R.color.color_primary));
         } else {
-            indicatorTextView.setTextColor(getResources().getColor(R.color.color_tab_indicator_text_normal));
+            indicatorTextView.setTextColor(textColor);
         }
     }
 

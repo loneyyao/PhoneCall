@@ -44,13 +44,14 @@ public class MainActivity_new extends AppCompatActivity {
         fragmentList = new ArrayList<>();
 
         tabHome.setTag(fragmentList.size());
-        fragmentList.add(MainFragment.newInstance("我是首页", "是首页呢"));
+        fragmentList.add(MainFragment.newInstance());
 
         tabShopCar.setTag(fragmentList.size());
-        fragmentList.add(AddressListFragment.newInstance(1));
+        fragmentList.add(AddressListFragment.newInstance());
 
         tabMine.setTag(fragmentList.size());
         fragmentList.add(BadCallIListFragment.newInstance(1));
+        tabHome.setSelected(true);
 
         myViewPager.setAdapter(new MyFragmentPagerAdapter(getSupportFragmentManager(), fragmentList));
         myViewPager.setOverScrollMode(View.OVER_SCROLL_NEVER);

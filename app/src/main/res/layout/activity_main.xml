@@ -13,12 +13,22 @@
         android:textSize="28sp" />
 
     <TextView
+        android:id="@+id/tv_owner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/tv_title"
         android:layout_marginTop="8dp"
         android:gravity="center"
         android:text="By aJIEw" />
+
+    <TextView
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_owner"
+        android:layout_marginTop="8dp"
+        android:layout_centerHorizontal="true"
+        android:text="@string/info" />
+
 
     <Switch
         android:id="@+id/switch_default_phone_call"

@@ -18,7 +18,7 @@
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_alignParentBottom="true"
-        android:background="@android:color/darker_gray"
+        android:background="@color/color_bar_bg"
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
@@ -29,7 +29,8 @@
             android:layout_weight="1"
             android:onClick="onTabIndicatorItemClick"
             app:tab_indicator_image_src="@drawable/chuck_ic_delete_white_24dp"
-            app:tab_indicator_text_string="首页" />
+            app:tab_indicator_text_string="首页"
+            app:tab_indicator_textColor="@color/white"/>
 
         <com.ajiew.phonecallapp.TabIndicatorItemView
             android:id="@+id/tab_shopcar"
@@ -38,7 +39,8 @@
             android:layout_weight="1"
             android:onClick="onTabIndicatorItemClick"
             app:tab_indicator_image_src="@drawable/chuck_ic_delete_white_24dp"
-            app:tab_indicator_text_string="骚扰设置"/>
+            app:tab_indicator_text_string="骚扰设置"
+            app:tab_indicator_textColor="@color/white"/>
 
         <com.ajiew.phonecallapp.TabIndicatorItemView
             android:id="@+id/tab_mine"
@@ -47,7 +49,8 @@
             android:layout_weight="1"
             android:onClick="onTabIndicatorItemClick"
             app:tab_indicator_image_src="@drawable/chuck_ic_delete_white_24dp"
-            app:tab_indicator_text_string="阻止列表" />
+            app:tab_indicator_text_string="阻止列表"
+            app:tab_indicator_textColor="@color/white"/>
 
     </LinearLayout>
 </LinearLayout>

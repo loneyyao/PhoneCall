@@ -14,43 +14,62 @@ import java.util.List;
  * {@link RecyclerView.Adapter} that can display a {@link DummyItem}.
  * TODO: Replace the implementation with code for your data type.
  */
-public class MyAddressItemRecyclerViewAdapter extends RecyclerView.Adapter<MyAddressItemRecyclerViewAdapter.ViewHolder> {
+public class MyAddressItemRecyclerViewAdapter extends RecyclerView.Adapter<MyAddressItemRecyclerViewAdapter.AddressViewHolder> {
 
-    private final List<DummyItem> mValues;
+    private List<Address> mValues;
+    private ItemLongClickListener itemLongClickListener;
 
-    public MyAddressItemRecyclerViewAdapter(List<DummyItem> items) {
-        mValues = items;
+    public MyAddressItemRecyclerViewAdapter() {
+
+    }
+
+    public void setmValues(List<Address> mValues) {
+        this.mValues = mValues;
+        notifyDataSetChanged();
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public AddressViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.fragment_address_list, parent, false);
-        return new ViewHolder(view);
+                .inflate(R.layout.fragment_address_list_item, parent, false);
+        return new AddressViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, int position) {
-        holder.mItem = mValues.get(position);
-        holder.mIdView.setText(mValues.get(position).id);
-        holder.mContentView.setText(mValues.get(position).content);
+    public void onBindViewHolder(final AddressViewHolder holder, int position) {
+        Address address = mValues.get(position);
+        holder.mContentView.setText(address.getName());
+        holder.mView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                if (itemLongClickListener != null) {
+                    return itemLongClickListener.onLongClickListener(v, holder.getAdapterPosition());
+                }
+                return false;
+            }
+        });
     }
 
     @Override
     public int getItemCount() {
-        return mValues.size();
+        return mValues == null ? 0 : mValues.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
-        public final View mView;
-        public final TextView mIdView;
-        public final TextView mContentView;
-        public DummyItem mItem;
+    public ItemLongClickListener getItemLongClickListener() {
+        return itemLongClickListener;
+    }
 
-        public ViewHolder(View view) {
+    public void setItemLongClickListener(ItemLongClickListener itemLongClickListener) {
+        this.itemLongClickListener = itemLongClickListener;
+    }
+
+    public class AddressViewHolder extends RecyclerView.ViewHolder {
+        public final View mView;
+        public final TextView mContentView;
+
+        public AddressViewHolder(View view) {
             super(view);
             mView = view;
-            mIdView = (TextView) view.findViewById(R.id.item_number);
             mContentView = (TextView) view.findViewById(R.id.content);
         }
 

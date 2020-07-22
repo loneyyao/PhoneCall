@@ -8,14 +8,20 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.ajiew.phonecallapp.ActivityStack;
+import com.ajiew.phonecallapp.Address;
+import com.ajiew.phonecallapp.AppDatabase;
 import com.ajiew.phonecallapp.CallAddress;
+import com.ajiew.phonecallapp.CallLog;
 import com.ajiew.phonecallapp.Const;
 import com.ajiew.phonecallapp.GetPhoneAddressService;
 import com.ajiew.phonecallapp.SPUtils;
 import com.readystatesoftware.chuck.ChuckInterceptor;
 
+import java.util.List;
+
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
@@ -49,7 +55,7 @@ public class PhoneCallService extends InCallService {
                 .baseUrl("http://api.k780.com:88")
                 .client(okHttpClient)
                 .build();
-        keyWord = (String)SPUtils.get(this, Const.KEYWORD, "");
+        keyWord = (String) SPUtils.get(this, Const.KEYWORD, "");
         getPhoneAddressService = retrofit.create(GetPhoneAddressService.class);
         manager = new PhoneCallManager(this);
     }
@@ -81,20 +87,30 @@ public class PhoneCallService extends InCallService {
         PhoneCallManager.call = call;
 
         CallType callType = null;
-        Log.d(TAG, "onCallAdded: callState"+call.getState());
+        Log.d(TAG, "onCallAdded: callState" + call.getState());
         switch (call.getState()) {
             case Call.STATE_RINGING:
                 callType = CallType.CALL_IN;
                 getPhoneAddressService.getUsers(call.getDetails().getHandle().getSchemeSpecificPart())
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribeOn(Schedulers.io()).map(new Function<CallAddress, CallAddress>() {
+                    @Override
+                    public CallAddress apply(CallAddress callAddress) throws Exception {
+                        List<Address> addressList = AppDatabase.getInstance(PhoneCallService.this).addressDao().getAll();
+                        for (Address address : addressList) {
+                            if (callAddress.getResult().getAtt().contains(address.getName())) {
+                                manager.disconnect();
+                                AppDatabase.getInstance(PhoneCallService.this).callLogDao()
+                                        .insertAll(new CallLog(callAddress.getResult().getPhone(), callAddress.getResult().getAtt()));
+                                return callAddress;
+                            }
+                        }
+                        return callAddress;
+                    }
+                }).observeOn(AndroidSchedulers.mainThread())
                         .subscribe(new Consumer<CallAddress>() {
                             @Override
                             public void accept(CallAddress callAddress) throws Exception {
-                                Toast.makeText(PhoneCallService.this, callAddress.getResult().getAtt(), Toast.LENGTH_LONG).show();
-                                if (callAddress.getResult().getAtt().contains(keyWord)){
-                                    manager.disconnect();
-                                }
+                                Toast.makeText(PhoneCallService.this, "已拦截 \"" + callAddress.getResult().getAtt() + "\" 的电话", Toast.LENGTH_LONG).show();
                             }
                         });
                 break;
