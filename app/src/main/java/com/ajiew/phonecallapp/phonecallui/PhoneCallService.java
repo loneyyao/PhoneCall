@@ -92,25 +92,22 @@ public class PhoneCallService extends InCallService {
             case Call.STATE_RINGING:
                 callType = CallType.CALL_IN;
                 getPhoneAddressService.getUsers(call.getDetails().getHandle().getSchemeSpecificPart())
-                        .subscribeOn(Schedulers.io()).map(new Function<CallAddress, CallAddress>() {
-                    @Override
-                    public CallAddress apply(CallAddress callAddress) throws Exception {
-                        List<Address> addressList = AppDatabase.getInstance(PhoneCallService.this).addressDao().getAll();
-                        for (Address address : addressList) {
-                            if (callAddress.getResult().getAtt().contains(address.getName())) {
-                                manager.disconnect();
-                                AppDatabase.getInstance(PhoneCallService.this).callLogDao()
-                                        .insertAll(new CallLog(callAddress.getResult().getPhone(), callAddress.getResult().getAtt()));
-                                return callAddress;
-                            }
-                        }
-                        return callAddress;
-                    }
-                }).observeOn(AndroidSchedulers.mainThread())
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(new Consumer<CallAddress>() {
                             @Override
                             public void accept(CallAddress callAddress) throws Exception {
-                                Toast.makeText(PhoneCallService.this, "已拦截 \"" + callAddress.getResult().getAtt() + "\" 的电话", Toast.LENGTH_LONG).show();
+                                List<Address> addressList = AppDatabase.getInstance(PhoneCallService.this).addressDao().getAll();
+                                for (Address address : addressList) {
+                                    if (callAddress.getResult().getAtt().contains(address.getName())) {
+                                        manager.disconnect();
+                                        Toast.makeText(PhoneCallService.this, "已拦截 \"" + callAddress.getResult().getAtt() + "\" 的电话", Toast.LENGTH_LONG).show();
+                                        AppDatabase.getInstance(PhoneCallService.this).callLogDao()
+                                                .insertAll(new CallLog(callAddress.getResult().getPhone(), callAddress.getResult().getAtt()));
+                                        break;
+                                    }
+                                }
+
                             }
                         });
                 break;

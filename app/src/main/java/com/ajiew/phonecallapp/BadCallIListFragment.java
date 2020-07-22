@@ -70,7 +70,6 @@ public class BadCallIListFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         initView();
-        initData(null);
     }
 
     /**
@@ -91,6 +90,12 @@ public class BadCallIListFragment extends Fragment {
                 adapter.setmValues(addresses);
             }
         });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        initData(null);
     }
 
     private void initView() {
