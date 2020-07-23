@@ -1,8 +1,7 @@
-package com.ajiew.phonecallapp;
+package com.ajiew.phonecallapp.net;
 
 import io.reactivex.Observable;
 import retrofit2.http.GET;
-import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 public interface GetPhoneAddressService {

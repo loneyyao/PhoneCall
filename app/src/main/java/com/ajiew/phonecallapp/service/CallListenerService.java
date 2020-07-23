@@ -1,4 +1,4 @@
-package com.ajiew.phonecallapp.listenphonecall;
+package com.ajiew.phonecallapp.service;
 
 import android.app.Service;
 import android.content.Context;
@@ -20,7 +20,7 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
-import com.ajiew.phonecallapp.MainActivity;
+import com.ajiew.phonecallapp.ui.MainActivity;
 import com.ajiew.phonecallapp.R;
 
 

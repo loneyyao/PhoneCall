@@ -1,4 +1,4 @@
-package com.ajiew.phonecallapp;
+package com.ajiew.phonecallapp.ui;
 
 import android.app.ActivityManager;
 import android.content.Context;
@@ -12,18 +12,16 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.telecom.TelecomManager;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.CompoundButton;
-import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.Toast;
 
-import com.ajiew.phonecallapp.listenphonecall.CallListenerService;
+import com.ajiew.phonecallapp.R;
+import com.ajiew.phonecallapp.service.CallListenerService;
 
 import java.lang.reflect.Field;
 

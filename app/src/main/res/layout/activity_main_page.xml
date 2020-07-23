@@ -7,7 +7,7 @@
     android:orientation="vertical">
 
 
-    <com.ajiew.phonecallapp.NoScrollViewPager
+    <com.ajiew.phonecallapp.widget.NoScrollViewPager
         android:id="@+id/main_viewpager"
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -22,7 +22,7 @@
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
-        <com.ajiew.phonecallapp.TabIndicatorItemView
+        <com.ajiew.phonecallapp.widget.TabIndicatorItemView
             android:id="@+id/tab_home"
             android:layout_width="0dp"
             android:layout_height="match_parent"
@@ -32,7 +32,7 @@
             app:tab_indicator_text_string="首页"
             app:tab_indicator_textColor="@color/white"/>
 
-        <com.ajiew.phonecallapp.TabIndicatorItemView
+        <com.ajiew.phonecallapp.widget.TabIndicatorItemView
             android:id="@+id/tab_shopcar"
             android:layout_width="0dp"
             android:layout_height="match_parent"
@@ -42,7 +42,7 @@
             app:tab_indicator_text_string="骚扰设置"
             app:tab_indicator_textColor="@color/white"/>
 
-        <com.ajiew.phonecallapp.TabIndicatorItemView
+        <com.ajiew.phonecallapp.widget.TabIndicatorItemView
             android:id="@+id/tab_mine"
             android:layout_width="0dp"
             android:layout_height="match_parent"

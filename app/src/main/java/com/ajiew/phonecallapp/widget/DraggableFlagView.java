@@ -1,4 +1,4 @@
-package com.ajiew.phonecallapp;
+package com.ajiew.phonecallapp.widget;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -27,7 +27,8 @@ import android.view.animation.LinearInterpolator;
 import android.view.animation.OvershootInterpolator;
 import android.widget.AbsListView;
 import android.widget.ScrollView;
-import android.widget.TextView;
+
+import com.ajiew.phonecallapp.R;
 
 
 public class DraggableFlagView extends AppCompatTextView {

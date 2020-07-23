@@ -41,7 +41,7 @@
             android:textSize="@dimen/sp_12" />
     </LinearLayout>
 
-    <com.ajiew.phonecallapp.DraggableFlagView
+    <com.ajiew.phonecallapp.widget.DraggableFlagView
         android:id="@+id/dfv_remind"
         android:layout_width="@dimen/dp_18"
         android:layout_height="@dimen/dp_18"

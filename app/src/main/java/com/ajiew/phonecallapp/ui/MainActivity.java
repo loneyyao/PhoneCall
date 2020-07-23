@@ -1,4 +1,4 @@
-package com.ajiew.phonecallapp;
+package com.ajiew.phonecallapp.ui;
 
 import android.app.ActivityManager;
 import android.content.Context;
@@ -20,7 +20,10 @@ import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.Toast;
 
-import com.ajiew.phonecallapp.listenphonecall.CallListenerService;
+import com.ajiew.phonecallapp.Const;
+import com.ajiew.phonecallapp.R;
+import com.ajiew.phonecallapp.SPUtils;
+import com.ajiew.phonecallapp.service.CallListenerService;
 
 import java.lang.reflect.Field;
 

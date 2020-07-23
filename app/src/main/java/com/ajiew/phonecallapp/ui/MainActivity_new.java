@@ -1,4 +1,4 @@
-package com.ajiew.phonecallapp;
+package com.ajiew.phonecallapp.ui;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -10,6 +10,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+
+import com.ajiew.phonecallapp.widget.NoScrollViewPager;
+import com.ajiew.phonecallapp.R;
+import com.ajiew.phonecallapp.widget.TabIndicatorItemView;
 
 import java.util.ArrayList;
 import java.util.List;

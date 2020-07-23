@@ -1,16 +1,12 @@
-package com.ajiew.phonecallapp.phonecallui;
+package com.ajiew.phonecallapp.ui;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
-import android.media.Image;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
-import android.support.v7.app.AppCompatActivity;
-import android.telecom.Call;
-import android.text.TextUtils;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
@@ -18,15 +14,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ajiew.phonecallapp.ActivityStack;
-import com.ajiew.phonecallapp.Address;
-import com.ajiew.phonecallapp.AppDatabase;
-import com.ajiew.phonecallapp.CallAddress;
-import com.ajiew.phonecallapp.CallLog;
-import com.ajiew.phonecallapp.Const;
+import com.ajiew.phonecallapp.db.Address;
+import com.ajiew.phonecallapp.db.AppDatabase;
+import com.ajiew.phonecallapp.net.CallAddress;
+import com.ajiew.phonecallapp.db.CallLog;
 import com.ajiew.phonecallapp.Event;
-import com.ajiew.phonecallapp.GetPhoneAddressService;
+import com.ajiew.phonecallapp.net.GetPhoneAddressService;
 import com.ajiew.phonecallapp.R;
-import com.ajiew.phonecallapp.SPUtils;
+import com.ajiew.phonecallapp.service.PhoneCallManager;
+import com.ajiew.phonecallapp.service.PhoneCallService;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.readystatesoftware.chuck.ChuckInterceptor;
@@ -49,7 +45,7 @@ import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-import static com.ajiew.phonecallapp.listenphonecall.CallListenerService.formatPhoneNumber;
+import static com.ajiew.phonecallapp.service.CallListenerService.formatPhoneNumber;
 
 
 /**

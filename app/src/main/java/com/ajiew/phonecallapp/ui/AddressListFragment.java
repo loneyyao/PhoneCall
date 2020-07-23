@@ -1,4 +1,4 @@
-package com.ajiew.phonecallapp;
+package com.ajiew.phonecallapp.ui;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -15,6 +15,12 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.ajiew.phonecallapp.widget.ItemLongClickListener;
+import com.ajiew.phonecallapp.widget.PromptDialog;
+import com.ajiew.phonecallapp.R;
+import com.ajiew.phonecallapp.db.Address;
+import com.ajiew.phonecallapp.db.AppDatabase;
 
 import java.util.List;
 

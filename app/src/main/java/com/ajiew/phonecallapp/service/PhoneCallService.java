@@ -1,38 +1,16 @@
-package com.ajiew.phonecallapp.phonecallui;
+package com.ajiew.phonecallapp.service;
 
-import android.content.Intent;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.telecom.Call;
 import android.telecom.InCallService;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.ajiew.phonecallapp.ActivityStack;
-import com.ajiew.phonecallapp.Address;
-import com.ajiew.phonecallapp.AppDatabase;
-import com.ajiew.phonecallapp.CallAddress;
-import com.ajiew.phonecallapp.CallLog;
-import com.ajiew.phonecallapp.Const;
 import com.ajiew.phonecallapp.Event;
-import com.ajiew.phonecallapp.GetPhoneAddressService;
-import com.ajiew.phonecallapp.SPUtils;
-import com.readystatesoftware.chuck.ChuckInterceptor;
-import com.trello.rxlifecycle2.android.ActivityEvent;
+import com.ajiew.phonecallapp.ui.PhoneCallActivity;
 
 import org.greenrobot.eventbus.EventBus;
-
-import java.util.List;
-
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.Consumer;
-import io.reactivex.functions.Function;
-import io.reactivex.schedulers.Schedulers;
-import io.reactivex.subjects.BehaviorSubject;
-import okhttp3.OkHttpClient;
-import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * 监听电话通信状态的服务，实现该类的同时必须提供电话管理的 UI

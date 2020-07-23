@@ -1,4 +1,4 @@
-package com.ajiew.phonecallapp;
+package com.ajiew.phonecallapp.widget;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -8,11 +8,12 @@ import android.graphics.drawable.ColorDrawable;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import com.ajiew.phonecallapp.R;
 
 
 public class PromptDialog extends AlertDialog {

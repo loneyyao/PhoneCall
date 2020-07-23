@@ -1,4 +1,4 @@
-package com.ajiew.phonecallapp;
+package com.ajiew.phonecallapp.db;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
