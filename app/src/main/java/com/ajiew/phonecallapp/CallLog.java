@@ -2,6 +2,7 @@ package com.ajiew.phonecallapp;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 @Entity
@@ -13,7 +14,10 @@ public class CallLog {
     @ColumnInfo(name = "address")
     private String address;
 
-    public CallLog(){}
+    public CallLog() {
+    }
+
+    @Ignore
     public CallLog(String call, String address) {
         this.call = call;
         this.address = address;

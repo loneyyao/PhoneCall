@@ -18,6 +18,8 @@ public class MyBadCallItemRecyclerViewAdapter extends RecyclerView.Adapter<MyBad
 
     private List<CallLog> mValues;
     private ItemLongClickListener itemLongClickListener;
+    private ItemClickListener itemClickListener;
+
 
     public MyBadCallItemRecyclerViewAdapter() {
 
@@ -49,6 +51,15 @@ public class MyBadCallItemRecyclerViewAdapter extends RecyclerView.Adapter<MyBad
                 return false;
             }
         });
+        holder.mView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (itemClickListener != null) {
+                    itemClickListener.onItemClick(v, holder.getAdapterPosition());
+                }
+
+            }
+        });
     }
 
     @Override
@@ -62,6 +73,14 @@ public class MyBadCallItemRecyclerViewAdapter extends RecyclerView.Adapter<MyBad
 
     public void setItemLongClickListener(ItemLongClickListener itemLongClickListener) {
         this.itemLongClickListener = itemLongClickListener;
+    }
+
+    public ItemClickListener getItemClickListener() {
+        return itemClickListener;
+    }
+
+    public void setItemClickListener(ItemClickListener itemClickListener) {
+        this.itemClickListener = itemClickListener;
     }
 
     public static class CallLogViewHolder extends RecyclerView.ViewHolder {

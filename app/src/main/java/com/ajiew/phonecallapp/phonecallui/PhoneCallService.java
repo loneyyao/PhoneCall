@@ -1,5 +1,6 @@
 package com.ajiew.phonecallapp.phonecallui;
 
+import android.content.Intent;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.telecom.Call;
@@ -13,9 +14,13 @@ import com.ajiew.phonecallapp.AppDatabase;
 import com.ajiew.phonecallapp.CallAddress;
 import com.ajiew.phonecallapp.CallLog;
 import com.ajiew.phonecallapp.Const;
+import com.ajiew.phonecallapp.Event;
 import com.ajiew.phonecallapp.GetPhoneAddressService;
 import com.ajiew.phonecallapp.SPUtils;
 import com.readystatesoftware.chuck.ChuckInterceptor;
+import com.trello.rxlifecycle2.android.ActivityEvent;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.List;
 
@@ -23,6 +28,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
+import io.reactivex.subjects.BehaviorSubject;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
@@ -39,25 +45,10 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class PhoneCallService extends InCallService {
 
     private static final String TAG = PhoneCallService.class.getSimpleName();
-    private GetPhoneAddressService getPhoneAddressService;
-    private String keyWord;
-    private PhoneCallManager manager;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        OkHttpClient okHttpClient = new OkHttpClient.Builder()
-                .addInterceptor(new ChuckInterceptor(this))
-                .build();
-        Retrofit retrofit = new Retrofit.Builder()
-                .addConverterFactory(GsonConverterFactory.create())
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .baseUrl("http://api.k780.com:88")
-                .client(okHttpClient)
-                .build();
-        keyWord = (String) SPUtils.get(this, Const.KEYWORD, "");
-        getPhoneAddressService = retrofit.create(GetPhoneAddressService.class);
-        manager = new PhoneCallManager(this);
     }
 
     private Call.Callback callback = new Call.Callback() {
@@ -67,6 +58,7 @@ public class PhoneCallService extends InCallService {
 
             switch (state) {
                 case Call.STATE_ACTIVE: {
+                    EventBus.getDefault().post(new Event.CallActiveEvent());
                     break;
                 }
 
@@ -91,25 +83,6 @@ public class PhoneCallService extends InCallService {
         switch (call.getState()) {
             case Call.STATE_RINGING:
                 callType = CallType.CALL_IN;
-                getPhoneAddressService.getUsers(call.getDetails().getHandle().getSchemeSpecificPart())
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(new Consumer<CallAddress>() {
-                            @Override
-                            public void accept(CallAddress callAddress) throws Exception {
-                                List<Address> addressList = AppDatabase.getInstance(PhoneCallService.this).addressDao().getAll();
-                                for (Address address : addressList) {
-                                    if (callAddress.getResult().getAtt().contains(address.getName())) {
-                                        manager.disconnect();
-                                        Toast.makeText(PhoneCallService.this, "已拦截 \"" + callAddress.getResult().getAtt() + "\" 的电话", Toast.LENGTH_LONG).show();
-                                        AppDatabase.getInstance(PhoneCallService.this).callLogDao()
-                                                .insertAll(new CallLog(callAddress.getResult().getPhone(), callAddress.getResult().getAtt()));
-                                        break;
-                                    }
-                                }
-
-                            }
-                        });
                 break;
             case Call.STATE_CONNECTING:
                 callType = CallType.CALL_OUT;
@@ -127,13 +100,12 @@ public class PhoneCallService extends InCallService {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        manager.destroy();
+        Log.d("lzj", " PhoneCall Service onDestroy");
     }
 
     @Override
     public void onCallRemoved(Call call) {
         super.onCallRemoved(call);
-
         call.unregisterCallback(callback);
         PhoneCallManager.call = null;
     }

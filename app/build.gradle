@@ -78,4 +78,23 @@ dependencies {
     implementation rootProject.ext.dependencies["room"]
     annotationProcessor  rootProject.ext.dependencies["room-annotationProcessor"]
     debugImplementation 'com.amitshekhar.android:debug-db:1.0.4'
+    implementation 'jp.wasabeef:glide-transformations:4.1.0'
+
+    api(rootProject.ext.dependencies["rxlifecycle2"]) {
+        exclude module: 'rxjava'
+        exclude module: 'jsr305'
+    }
+    api(rootProject.ext.dependencies["rxlifecycle2-android"]) {
+        exclude module: 'support-annotations'
+        exclude module: 'rxjava'
+        exclude module: 'rxandroid'
+        exclude module: 'rxlifecycle'
+    }
+    api(rootProject.ext.dependencies["rxlifecycle2-components"]) {
+        exclude module: 'support-annotations'
+        exclude module: 'rxjava'
+        exclude module: 'rxandroid'
+        exclude module: 'rxlifecycle'
+    }
+    implementation rootProject.ext.dependencies["eventbus"]
 }

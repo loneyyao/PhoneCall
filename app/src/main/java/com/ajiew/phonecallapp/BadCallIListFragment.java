@@ -1,6 +1,8 @@
 package com.ajiew.phonecallapp;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -37,6 +39,8 @@ public class BadCallIListFragment extends Fragment {
     @BindView(R.id.tv_more)
     TextView tv_more;
 
+    private List<CallLog> callLogList;
+
     private MyBadCallItemRecyclerViewAdapter adapter = new MyBadCallItemRecyclerViewAdapter();
 
 
@@ -58,6 +62,7 @@ public class BadCallIListFragment extends Fragment {
 
         }
     }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -82,7 +87,8 @@ public class BadCallIListFragment extends Fragment {
         observable.subscribeOn(Schedulers.io()).map(new Function<String, List<CallLog>>() {
             @Override
             public List<CallLog> apply(String s) throws Exception {
-                return AppDatabase.getInstance(getActivity()).callLogDao().getAll();
+                callLogList = AppDatabase.getInstance(getActivity()).callLogDao().getAll();
+                return callLogList;
             }
         }).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<List<CallLog>>() {
             @Override
@@ -102,6 +108,61 @@ public class BadCallIListFragment extends Fragment {
         tv_more.setVisibility(View.GONE);
         tv_title.setText("拦截记录");
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        adapter.setItemLongClickListener(new ItemLongClickListener() {
+            @Override
+            public boolean onLongClickListener(View v, int position) {
+                CallLog callLog = callLogList.get(position);
+                PromptDialog promptDialog = PromptDialog.newInstance(getActivity(), "", "删除通话记录 : " + callLog.getCall() + " " + callLog.getAddress() + "?");
+                promptDialog.setPromptButtonClickedListener(new PromptDialog.OnPromptButtonClickedListener() {
+                    @Override
+                    public void onPositiveButtonClicked(String msg) {
+                        initData(Observable.just(msg)
+                                .subscribeOn(Schedulers.io())
+                                .map(new Function<String, String>() {
+                                    @Override
+                                    public String apply(String s) throws Exception {
+                                        AppDatabase.getInstance(getActivity()).callLogDao().delete(callLog);
+                                        return "";
+                                    }
+                                }));
+
+                    }
+
+                    @Override
+                    public void onNegativeButtonClicked() {
+
+                    }
+                });
+                promptDialog.show();
+
+                return false;
+            }
+        });
+
+        adapter.setItemClickListener(new ItemClickListener() {
+            @Override
+            public void onItemClick(View v, int position) {
+                CallLog callLog = callLogList.get(position);
+
+                PromptDialog promptDialog = PromptDialog.newInstance(getActivity(), "", "给: " + callLog.getCall() + " " + callLog.getAddress() + " 回拨电话?");
+                promptDialog.setPromptButtonClickedListener(new PromptDialog.OnPromptButtonClickedListener() {
+                    @Override
+                    public void onPositiveButtonClicked(String msg) {
+                        Intent intent = new Intent(Intent.ACTION_CALL);
+                        Uri data = Uri.parse("tel:" + callLog.getCall());
+                        intent.setData(data);
+                        startActivity(intent);
+                    }
+
+                    @Override
+                    public void onNegativeButtonClicked() {
+
+                    }
+                });
+                promptDialog.show();
+            }
+        });
+
         recyclerView.setAdapter(adapter);
     }
 }
