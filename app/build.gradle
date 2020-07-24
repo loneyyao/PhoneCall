@@ -14,9 +14,9 @@ android {
     signingConfigs {
         release {
             storeFile file("phonecall.jks")
-            storePassword '小狮子的密码'  //这个不是密码哦
-            keyAlias = '小狮子'
-            keyPassword '小狮子的密码'   //这个不是密码哦
+            storePassword '123456'
+            keyAlias = 'lion'
+            keyPassword '123456'
         }
     }
     buildTypes {
@@ -26,6 +26,7 @@ android {
             minifyEnabled false  //是否混淆
             shrinkResources false  //删除无用资源 配合上面的使用
             zipAlignEnabled true
+            signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
 
