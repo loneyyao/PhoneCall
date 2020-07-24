@@ -14,9 +14,9 @@ android {
     signingConfigs {
         release {
             storeFile file("phonecall.jks")
-            storePassword 'lzjsy940715'
+            storePassword '小狮子的密码'  //这个不是密码哦
             keyAlias = '小狮子'
-            keyPassword 'lzjsy940715'
+            keyPassword '小狮子的密码'   //这个不是密码哦
         }
     }
     buildTypes {
