@@ -10,9 +10,33 @@ android {
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
-    buildTypes {
+
+    signingConfigs {
         release {
+            storeFile file("phonecall.jks")
+            storePassword 'lzjsy940715'
+            keyAlias = '小狮子'
+            keyPassword 'lzjsy940715'
+        }
+    }
+    buildTypes {
+        debug {
+            buildConfigField "boolean", "LOG_DEBUG", "true"
+            buildConfigField "boolean", "USE_CANARY", "true"
+            minifyEnabled false  //是否混淆
+            shrinkResources false  //删除无用资源 配合上面的使用
+            zipAlignEnabled true
+            signingConfig signingConfigs.release
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+
+        release {
+            buildConfigField "boolean", "LOG_DEBUG", "false"
+            buildConfigField "boolean", "USE_CANARY", "false"
             minifyEnabled false
+            shrinkResources false
+            zipAlignEnabled true
+            signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -69,7 +93,7 @@ dependencies {
     //test
     api rootProject.ext.dependencies["timber"]
 
-    implementation ('com.readystatesoftware.chuck:library:1.1.0')
+    debugImplementation ('com.readystatesoftware.chuck:library:1.1.0')
     releaseImplementation 'com.readystatesoftware.chuck:library-no-op:1.1.0'
     debugImplementation 'com.amitshekhar.android:debug-db:1.0.4'
     implementation 'com.jakewharton:butterknife:9.0.0'
