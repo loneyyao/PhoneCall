@@ -10,7 +10,7 @@ import androidx.room.Update;
 
 @Dao
 public interface CallLogDao {
-    @Query("SELECT * FROM CallLog")
+    @Query("SELECT * FROM CallLog ORDER BY id DESC")
     List<CallLog> getAll();
 
 

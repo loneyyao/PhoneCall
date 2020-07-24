@@ -10,11 +10,11 @@ import androidx.room.Update;
 
 @Dao
 public interface AddressDao {
-    @Query("SELECT * FROM Address")
+    @Query("SELECT * FROM Address ORDER BY id DESC")
     List<Address> getAll();
 
     @Query("SELECT * FROM Address WHERE name = :name")
-    Address getUserByMobile(String name);
+    Address getAddressByCall(String name);
 
     @Insert
     void insertAll(Address... address);

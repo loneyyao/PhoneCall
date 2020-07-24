@@ -1,28 +1,28 @@
 package com.ajiew.phonecallapp.ui;
 
-import android.content.Context;
-import android.content.DialogInterface;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Spannable;
+import android.text.SpannableString;
 import android.text.TextUtils;
+import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.ajiew.phonecallapp.db.DisturbType;
-import com.ajiew.phonecallapp.widget.AddAddressOrPhoneDialog;
-import com.ajiew.phonecallapp.widget.ItemLongClickListener;
-import com.ajiew.phonecallapp.widget.PromptDialog;
 import com.ajiew.phonecallapp.R;
 import com.ajiew.phonecallapp.db.Address;
 import com.ajiew.phonecallapp.db.AppDatabase;
+import com.ajiew.phonecallapp.widget.AddAddressOrPhoneDialog;
+import com.ajiew.phonecallapp.widget.ItemLongClickListener;
+import com.ajiew.phonecallapp.widget.PromptDialog;
 
 import java.util.List;
 
@@ -99,7 +99,7 @@ public class AddressListFragment extends Fragment {
             @Override
             public boolean onLongClickListener(View v, int position) {
                 Address address = addressList.get(position);
-                PromptDialog promptDialog = PromptDialog.newInstance(getActivity(), "", "删除屏蔽规则 : " + address.getName() + "?");
+                PromptDialog promptDialog = PromptDialog.newInstance(getActivity(), "", "删除屏蔽规则: \"" + address.getName() + "\" ?");
                 promptDialog.setPromptButtonClickedListener(new PromptDialog.OnPromptButtonClickedListener() {
                     @Override
                     public void onPositiveButtonClicked(String msg) {

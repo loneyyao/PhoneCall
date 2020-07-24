@@ -121,7 +121,7 @@ public class PhoneCallActivity extends RxAppCompatActivity implements View.OnCli
                     String stamp = ScheduleDateUtil.stampToDate(System.currentTimeMillis(), "yyyy-MM-dd HH:mm:ss");
                     Toast.makeText(PhoneCallActivity.this, "已拦截 \"" + phoneNumber + "\" 的来电", Toast.LENGTH_LONG).show();
                     AppDatabase.getInstance(PhoneCallActivity.this).callLogDao()
-                            .insertAll(new CallLog(phoneNumber, "黑名单电话", stamp));
+                            .insertAll(new CallLog(phoneNumber, "", stamp));
                     return;
                 }
             }

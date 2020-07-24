@@ -99,6 +99,13 @@ public class BadCallIListFragment extends Fragment {
             @Override
             public List<CallLog> apply(String s) throws Exception {
                 callLogList = AppDatabase.getInstance(getActivity()).callLogDao().getAll();
+                for (CallLog callLog : callLogList) {
+                    if (AppDatabase.getInstance(getActivity()).addressDao().getAddressByCall(callLog.getCall())!=null){
+                        callLog.setAddress("黑名单");
+                    }else{
+                        callLog.setAddress("曾在黑名单, 被拦截");
+                    }
+                }
                 return callLogList;
             }
         }).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<List<CallLog>>() {
@@ -123,7 +130,7 @@ public class BadCallIListFragment extends Fragment {
             @Override
             public boolean onLongClickListener(View v, int position) {
                 CallLog callLog = callLogList.get(position);
-                PromptDialog promptDialog = PromptDialog.newInstance(getActivity(), "", "删除通话记录 : " + callLog.getCall() + " " + callLog.getAddress() + "?");
+                PromptDialog promptDialog = PromptDialog.newInstance(getActivity(), "", "删除通话记录: \"" + callLog.getCall() + " " + callLog.getAddress() + "\" ?");
                 promptDialog.setPromptButtonClickedListener(new PromptDialog.OnPromptButtonClickedListener() {
                     @Override
                     public void onPositiveButtonClicked(String msg) {
@@ -155,7 +162,7 @@ public class BadCallIListFragment extends Fragment {
             public void onItemClick(View v, int position) {
                 CallLog callLog = callLogList.get(position);
 
-                PromptDialog promptDialog = PromptDialog.newInstance(getActivity(), "", "给: " + callLog.getCall() + " " + callLog.getAddress() + " 回拨电话?");
+                PromptDialog promptDialog = PromptDialog.newInstance(getActivity(), "", "给: \"" + callLog.getCall() + " " + callLog.getAddress() + "\" 回拨电话?");
                 promptDialog.setPromptButtonClickedListener(new PromptDialog.OnPromptButtonClickedListener() {
                     @Override
                     public void onPositiveButtonClicked(String msg) {
