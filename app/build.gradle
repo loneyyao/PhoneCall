@@ -26,7 +26,6 @@ android {
             minifyEnabled false  //是否混淆
             shrinkResources false  //删除无用资源 配合上面的使用
             zipAlignEnabled true
-            signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
 
