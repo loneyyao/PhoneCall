@@ -2,6 +2,7 @@ package com.ajiew.phonecallapp.db;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 @Entity
@@ -10,10 +11,15 @@ public class Address {
     private int id;
     @ColumnInfo(name = "name")
     private String name;
+    @ColumnInfo(name = "type")
+    private int type;
 
     public Address(){}
-    public Address(String address){
-        this.name = address;
+
+    @Ignore
+    public Address(int type,String name){
+        this.type = type;
+        this.name = name;
     }
 
     public int getId() {
@@ -30,5 +36,13 @@ public class Address {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
     }
 }

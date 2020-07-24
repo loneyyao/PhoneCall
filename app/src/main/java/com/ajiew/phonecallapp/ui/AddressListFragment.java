@@ -16,6 +16,8 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.ajiew.phonecallapp.db.DisturbType;
+import com.ajiew.phonecallapp.widget.AddAddressOrPhoneDialog;
 import com.ajiew.phonecallapp.widget.ItemLongClickListener;
 import com.ajiew.phonecallapp.widget.PromptDialog;
 import com.ajiew.phonecallapp.R;
@@ -26,6 +28,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.Unbinder;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
@@ -45,8 +48,8 @@ public class AddressListFragment extends Fragment {
     TextView tv_more;
 
     private MyAddressItemRecyclerViewAdapter adapter = new MyAddressItemRecyclerViewAdapter();
-    private PromptDialog dialog;
     private List<Address> addressList;
+    private Unbinder bind;
 
     public AddressListFragment() {
     }
@@ -71,8 +74,14 @@ public class AddressListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_address_list, container, false);
-        ButterKnife.bind(this, view);
+        bind = ButterKnife.bind(this, view);
         return view;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        bind.unbind();
     }
 
     @Override
@@ -83,13 +92,14 @@ public class AddressListFragment extends Fragment {
     }
 
     private void initView() {
+        tv_title.setText("拦截设置");
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setAdapter(adapter);
         adapter.setItemLongClickListener(new ItemLongClickListener() {   //长按删除屏蔽地址
             @Override
             public boolean onLongClickListener(View v, int position) {
                 Address address = addressList.get(position);
-                PromptDialog promptDialog = PromptDialog.newInstance(getActivity(), "", "删除屏蔽地址 : " + address.getName() + "?");
+                PromptDialog promptDialog = PromptDialog.newInstance(getActivity(), "", "删除屏蔽规则 : " + address.getName() + "?");
                 promptDialog.setPromptButtonClickedListener(new PromptDialog.OnPromptButtonClickedListener() {
                     @Override
                     public void onPositiveButtonClicked(String msg) {
@@ -124,47 +134,34 @@ public class AddressListFragment extends Fragment {
     }
 
     private void addAddress() {
-        if (dialog == null) {
-            dialog = new PromptDialog(getActivity(), "添加屏蔽地址", "", true);
-            dialog.setPromptButtonClickedListener(new PromptDialog.OnPromptButtonClickedListener() {
-                @Override
-                public void onPositiveButtonClicked(String msg) {
-                    if (TextUtils.isEmpty(msg)){
-                        return;
-                    }
-                    Toast.makeText(getActivity(), "将拦截" + msg + "的电话", Toast.LENGTH_LONG).show();
-                    initData(Observable.just(msg)
-                            .subscribeOn(Schedulers.io())
-                            .map(new Function<String, String>() {
-                                @Override
-                                public String apply(String s) throws Exception {
-                                    AppDatabase.getInstance(getActivity()).addressDao().insertAll(new Address(s));
-                                    return "";
-                                }
-                            }));
+
+        AddAddressOrPhoneDialog dialog = new AddAddressOrPhoneDialog(getActivity());
+        dialog.setPromptButtonClickedListener(new AddAddressOrPhoneDialog.OnButtonClickedListener() {
+            @Override
+            public void onPositiveButtonClicked(int type, String msg) {
+                if (TextUtils.isEmpty(msg)) {
+                    return;
                 }
+                Address address = new Address(type, msg);
+                Toast.makeText(getActivity(), "将拦截" + msg + "的来电", Toast.LENGTH_LONG).show();
+                initData(Observable.just(msg)
+                        .subscribeOn(Schedulers.io())
+                        .map(new Function<String, String>() {
+                            @Override
+                            public String apply(String s) throws Exception {
+                                AppDatabase.getInstance(getActivity()).addressDao().insertAll(address);
+                                return "";
+                            }
+                        }));
+            }
 
-                @Override
-                public void onNegativeButtonClicked() {
+            @Override
+            public void onNegativeButtonClicked() {
 
-                }
-            });
-            dialog.setOnShowListener(new DialogInterface.OnShowListener() {
-                @Override
-                public void onShow(DialogInterface dialog) {
-
-                    PromptDialog promptDialog = (PromptDialog) dialog;
-                    //调用系统输入法
-                    InputMethodManager inputManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-
-
-                    inputManager.showSoftInput(promptDialog.getEditText(), 0);
-                }
-            });
-        }
+            }
+        });
 
         dialog.show();
-
     }
 
     /**

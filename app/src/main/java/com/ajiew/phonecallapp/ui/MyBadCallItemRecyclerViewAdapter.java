@@ -39,7 +39,8 @@ public class MyBadCallItemRecyclerViewAdapter extends RecyclerView.Adapter<MyBad
     @Override
     public void onBindViewHolder(final MyBadCallItemRecyclerViewAdapter.CallLogViewHolder holder, int position) {
         CallLog callLog = mValues.get(position);
-        holder.call.setText(callLog.getCall());
+        String callTime = callLog.getCallTime();
+        holder.call.setText(callLog.getCall() + "    " + (callTime == null ? "" : callTime));
         holder.address.setText(callLog.getAddress());
         holder.mView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override

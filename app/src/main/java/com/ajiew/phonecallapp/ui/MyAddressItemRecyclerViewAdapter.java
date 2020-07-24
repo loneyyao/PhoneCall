@@ -8,6 +8,7 @@ import android.widget.TextView;
 
 import com.ajiew.phonecallapp.R;
 import com.ajiew.phonecallapp.db.Address;
+import com.ajiew.phonecallapp.db.DisturbType;
 import com.ajiew.phonecallapp.widget.ItemLongClickListener;
 
 import java.util.List;
@@ -30,14 +31,15 @@ public class MyAddressItemRecyclerViewAdapter extends RecyclerView.Adapter<MyAdd
     @Override
     public AddressViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.fragment_address_list_item, parent, false);
+                .inflate(R.layout.fragment_call_address_list_item, parent, false);
         return new AddressViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(final AddressViewHolder holder, int position) {
         Address address = mValues.get(position);
-        holder.mContentView.setText(address.getName());
+        holder.disturb_type.setText(DisturbType.value(address.getType()).getMsg());
+        holder.disturb_content.setText(address.getName());
         holder.mView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
@@ -64,17 +66,14 @@ public class MyAddressItemRecyclerViewAdapter extends RecyclerView.Adapter<MyAdd
 
     public class AddressViewHolder extends RecyclerView.ViewHolder {
         public final View mView;
-        public final TextView mContentView;
+        public final TextView disturb_type;
+        public final TextView disturb_content;
 
         public AddressViewHolder(View view) {
             super(view);
             mView = view;
-            mContentView = (TextView) view.findViewById(R.id.content);
-        }
-
-        @Override
-        public String toString() {
-            return super.toString() + " '" + mContentView.getText() + "'";
+            disturb_type = (TextView) view.findViewById(R.id.address_type);
+            disturb_content = (TextView) view.findViewById(R.id.address_content);
         }
     }
 }

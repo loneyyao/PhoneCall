@@ -14,13 +14,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ajiew.phonecallapp.ActivityStack;
+import com.ajiew.phonecallapp.Event;
+import com.ajiew.phonecallapp.R;
+import com.ajiew.phonecallapp.ScheduleDateUtil;
 import com.ajiew.phonecallapp.db.Address;
 import com.ajiew.phonecallapp.db.AppDatabase;
-import com.ajiew.phonecallapp.net.CallAddress;
 import com.ajiew.phonecallapp.db.CallLog;
-import com.ajiew.phonecallapp.Event;
+import com.ajiew.phonecallapp.db.DisturbType;
+import com.ajiew.phonecallapp.net.CallAddress;
 import com.ajiew.phonecallapp.net.GetPhoneAddressService;
-import com.ajiew.phonecallapp.R;
 import com.ajiew.phonecallapp.service.PhoneCallManager;
 import com.ajiew.phonecallapp.service.PhoneCallService;
 import com.bumptech.glide.Glide;
@@ -111,25 +113,42 @@ public class PhoneCallActivity extends RxAppCompatActivity implements View.OnCli
         if (getIntent() != null) {
             phoneNumber = getIntent().getStringExtra(Intent.EXTRA_PHONE_NUMBER);
             callType = (PhoneCallService.CallType) getIntent().getSerializableExtra(Intent.EXTRA_MIME_TYPES);
+            //优先电话拦截
+            List<Address> addressList = AppDatabase.getInstance(PhoneCallActivity.this).addressDao().getAll();
+            for (Address address : addressList) {
+                if (address.getType() == DisturbType.DISTURB_CALL.getType() && phoneNumber.contains(address.getName())) {
+                    phoneCallManager.disconnect();
+                    String stamp = ScheduleDateUtil.stampToDate(System.currentTimeMillis(), "yyyy-MM-dd HH:mm:ss");
+                    Toast.makeText(PhoneCallActivity.this, "已拦截 \"" + phoneNumber + "\" 的来电", Toast.LENGTH_LONG).show();
+                    AppDatabase.getInstance(PhoneCallActivity.this).callLogDao()
+                            .insertAll(new CallLog(phoneNumber, "黑名单电话", stamp));
+                    return;
+                }
+            }
+
+            //然后进行归属地拦截
             getPhoneAddressService.getUsers(phoneNumber)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .compose(this.bindToLifecycle())
                     .subscribe(new Consumer<CallAddress>() {
+
                         @Override
                         public void accept(CallAddress callAddress) throws Exception {
-                            tvCallAddress.setText(callAddress.getResult().getAtt() == null ? "查询归属地失败" : callAddress.getResult().getAtt());
+                            String att = callAddress.getResult().getAtt();
+                            String phone = callAddress.getResult().getPhone();
+                            tvCallAddress.setText(att == null ? "查询归属地失败" : att);
                             if (callType == PhoneCallService.CallType.CALL_OUT) {
                                 return;
                             }
-
                             List<Address> addressList = AppDatabase.getInstance(PhoneCallActivity.this).addressDao().getAll();
-                            for (Address address : addressList) {
-                                if (callAddress.getResult().getAtt().contains(address.getName())) {
+                            for (Address disturbAddress : addressList) {
+                                if (disturbAddress.getType() == DisturbType.DISTURB_ADDRESS.getType() && att.contains(disturbAddress.getName())) {
                                     phoneCallManager.disconnect();
-                                    Toast.makeText(PhoneCallActivity.this, "已拦截 \"" + callAddress.getResult().getAtt() + "\" 的电话", Toast.LENGTH_LONG).show();
+                                    String stamp = ScheduleDateUtil.stampToDate(System.currentTimeMillis(), "yyyy-MM-dd HH:mm:ss");
+                                    Toast.makeText(PhoneCallActivity.this, "已拦截 \"" + disturbAddress.getName() + "\" 的来电", Toast.LENGTH_LONG).show();
                                     AppDatabase.getInstance(PhoneCallActivity.this).callLogDao()
-                                            .insertAll(new CallLog(callAddress.getResult().getPhone(), callAddress.getResult().getAtt()));
+                                            .insertAll(new CallLog(phone, att, stamp));
                                     return;
                                 }
                             }

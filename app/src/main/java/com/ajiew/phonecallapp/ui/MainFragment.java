@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.CompoundButton;
 import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ajiew.phonecallapp.R;
@@ -27,6 +28,7 @@ import java.lang.reflect.Field;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.Unbinder;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -41,9 +43,13 @@ public class MainFragment extends Fragment {
 
     @BindView(R.id.switch_call_listenr)
     Switch switchListenCall;
-
+    @BindView(R.id.tv_title)
+    TextView tv_title;
+    @BindView(R.id.tv_more)
+    TextView tv_more;
 
     private CompoundButton.OnCheckedChangeListener switchCallCheckChangeListener;
+    private Unbinder bind;
 
 
     public MainFragment() {
@@ -69,10 +75,16 @@ public class MainFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_main, container, false);
-        ButterKnife.bind(this, view);
+        bind = ButterKnife.bind(this, view);
+        tv_title.setText("首页");
+        tv_more.setVisibility(View.GONE);
         return view;
+    }
 
-
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        bind.unbind();
     }
 
     @Override

@@ -24,6 +24,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.Unbinder;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
@@ -45,6 +46,7 @@ public class BadCallIListFragment extends Fragment {
     private List<CallLog> callLogList;
 
     private MyBadCallItemRecyclerViewAdapter adapter = new MyBadCallItemRecyclerViewAdapter();
+    private Unbinder bind;
 
 
     public BadCallIListFragment() {
@@ -70,8 +72,14 @@ public class BadCallIListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_bad_call_list, container, false);
-        ButterKnife.bind(this, view);
+        bind = ButterKnife.bind(this, view);
         return view;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        bind.unbind();
     }
 
     @Override

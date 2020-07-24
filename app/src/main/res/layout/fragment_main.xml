@@ -3,55 +3,66 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/tv_title"
+    <include
+        android:id="@+id/titlebar"
+        layout="@layout/activity_bar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/switch_call_listenr"
-        android:layout_marginTop="30dp"
-        android:gravity="center"
-        android:text="Phone Call App"
-        android:textSize="28sp" />
+        android:layout_height="wrap_content" />
 
-
-    <TextView
-        android:id="@+id/tv_owner"
+    <RelativeLayout
+        android:layout_below="@id/titlebar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/tv_title"
-        android:layout_marginTop="8dp"
-        android:gravity="center"
-        android:text="By 李泽君" />
+        android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/tv_info"
-        android:layout_width="300dp"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/tv_owner"
-        android:layout_centerHorizontal="true"
-        android:textColor="@color/colorPrimary"
-        android:layout_marginTop="30dp"
-        android:text="@string/info" />
+        <TextView
+            android:id="@+id/tv_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/switch_call_listenr"
+            android:layout_marginTop="30dp"
+            android:gravity="center"
+            android:text="Phone Call App"
+            android:textSize="28sp" />
 
-    <Switch
-        android:id="@+id/switch_default_phone_call"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="26dp"
-        android:layout_below="@id/tv_info"
-        android:layout_marginRight="16dp"
-        android:text="设为默认电话应用" />
 
-    <Switch
-        android:id="@+id/switch_call_listenr"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginRight="16dp"
-        android:text="开启电话监听服务"
-        android:visibility="gone" />
+        <TextView
+            android:id="@+id/tv_owner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_title"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:text="By 李泽君" />
 
+        <TextView
+            android:id="@+id/tv_info"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_owner"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="30dp"
+            android:text="@string/info"
+            android:textColor="@color/colorPrimary" />
+
+        <Switch
+            android:id="@+id/switch_default_phone_call"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_info"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="26dp"
+            android:layout_marginRight="16dp"
+            android:text="设为默认电话应用" />
+
+        <Switch
+            android:id="@+id/switch_call_listenr"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginRight="16dp"
+            android:text="开启电话监听服务"
+            android:visibility="gone" />
+    </RelativeLayout>
 
 </RelativeLayout>

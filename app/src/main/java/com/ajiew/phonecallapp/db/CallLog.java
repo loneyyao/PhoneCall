@@ -13,14 +13,17 @@ public class CallLog {
     private String call;
     @ColumnInfo(name = "address")
     private String address;
+    @ColumnInfo(name = "callTime")
+    private String callTime;
 
     public CallLog() {
     }
 
     @Ignore
-    public CallLog(String call, String address) {
+    public CallLog(String call, String address, String callTime) {
         this.call = call;
         this.address = address;
+        this.callTime = callTime;
     }
 
     public int getId() {
@@ -45,5 +48,13 @@ public class CallLog {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public String getCallTime() {
+        return callTime;
+    }
+
+    public void setCallTime(String callTime) {
+        this.callTime = callTime;
     }
 }

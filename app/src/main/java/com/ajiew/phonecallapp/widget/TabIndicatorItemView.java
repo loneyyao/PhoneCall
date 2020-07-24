@@ -92,7 +92,7 @@ public class TabIndicatorItemView extends LinearLayout {
     public void setSelected(boolean selected) {
         super.setSelected(selected);
         if (selected && isMainPage) {
-            indicatorTextView.setTextColor(getResources().getColor(R.color.color_primary));
+            indicatorTextView.setTextColor(getResources().getColor(R.color.color_tab_selected));
         } else {
             indicatorTextView.setTextColor(textColor);
         }

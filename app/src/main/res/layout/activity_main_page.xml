@@ -11,7 +11,7 @@
         android:id="@+id/main_viewpager"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"/>
+        android:layout_weight="1" />
 
     <LinearLayout
         android:id="@+id/main_tab"
@@ -28,9 +28,10 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:onClick="onTabIndicatorItemClick"
-            app:tab_indicator_image_src="@drawable/chuck_ic_delete_white_24dp"
-            app:tab_indicator_text_string="首页"
-            app:tab_indicator_textColor="@color/white"/>
+            app:tab_indicator_imageSize="@dimen/dp_22"
+            app:tab_indicator_image_src="@drawable/main_tab_home"
+            app:tab_indicator_textColor="@color/white"
+            app:tab_indicator_text_string="首页" />
 
         <com.ajiew.phonecallapp.widget.TabIndicatorItemView
             android:id="@+id/tab_shopcar"
@@ -38,9 +39,10 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:onClick="onTabIndicatorItemClick"
-            app:tab_indicator_image_src="@drawable/chuck_ic_delete_white_24dp"
-            app:tab_indicator_text_string="骚扰设置"
-            app:tab_indicator_textColor="@color/white"/>
+            app:tab_indicator_imageSize="@dimen/dp_22"
+            app:tab_indicator_image_src="@drawable/main_tab_disturb"
+            app:tab_indicator_textColor="@color/white"
+            app:tab_indicator_text_string="拦截设置" />
 
         <com.ajiew.phonecallapp.widget.TabIndicatorItemView
             android:id="@+id/tab_mine"
@@ -48,9 +50,10 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:onClick="onTabIndicatorItemClick"
-            app:tab_indicator_image_src="@drawable/chuck_ic_delete_white_24dp"
-            app:tab_indicator_text_string="阻止列表"
-            app:tab_indicator_textColor="@color/white"/>
+            app:tab_indicator_imageSize="@dimen/dp_22"
+            app:tab_indicator_image_src="@drawable/main_tab_record"
+            app:tab_indicator_textColor="@color/white"
+            app:tab_indicator_text_string="拦截记录" />
 
     </LinearLayout>
 </LinearLayout>
