@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Phone Call App</string>
+    <string name="app_name">Phone Call</string>
     <string name="info">请在屏蔽地址列表添加要屏蔽的城市: \n
                 1, 添加省份则屏蔽该省所有城市\n
         2, 添加市则屏蔽该城市 \n
