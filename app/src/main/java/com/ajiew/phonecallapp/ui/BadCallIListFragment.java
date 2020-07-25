@@ -8,17 +8,18 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.ajiew.phonecallapp.widget.ItemClickListener;
-import com.ajiew.phonecallapp.widget.ItemLongClickListener;
-import com.ajiew.phonecallapp.widget.PromptDialog;
 import com.ajiew.phonecallapp.R;
 import com.ajiew.phonecallapp.db.AppDatabase;
 import com.ajiew.phonecallapp.db.CallLog;
+import com.ajiew.phonecallapp.widget.ItemClickListener;
+import com.ajiew.phonecallapp.widget.ItemLongClickListener;
+import com.ajiew.phonecallapp.widget.PromptDialog;
 
 import java.util.List;
 
@@ -100,9 +101,12 @@ public class BadCallIListFragment extends Fragment {
             public List<CallLog> apply(String s) throws Exception {
                 callLogList = AppDatabase.getInstance(getActivity()).callLogDao().getAll();
                 for (CallLog callLog : callLogList) {
-                    if (AppDatabase.getInstance(getActivity()).addressDao().getAddressByCall(callLog.getCall())!=null){
+                    if (!TextUtils.isEmpty(callLog.getAddress())) {
+                        continue;
+                    }
+                    if (AppDatabase.getInstance(getActivity()).addressDao().getAddressByCall(callLog.getCall()) != null) {
                         callLog.setAddress("黑名单");
-                    }else{
+                    } else {
                         callLog.setAddress("曾在黑名单, 被拦截");
                     }
                 }

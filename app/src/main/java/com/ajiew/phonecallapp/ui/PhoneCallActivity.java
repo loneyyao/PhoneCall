@@ -113,50 +113,53 @@ public class PhoneCallActivity extends RxAppCompatActivity implements View.OnCli
         if (getIntent() != null) {
             phoneNumber = getIntent().getStringExtra(Intent.EXTRA_PHONE_NUMBER);
             callType = (PhoneCallService.CallType) getIntent().getSerializableExtra(Intent.EXTRA_MIME_TYPES);
-            //优先电话拦截
-            List<Address> addressList = AppDatabase.getInstance(PhoneCallActivity.this).addressDao().getAll();
-            for (Address address : addressList) {
-                if (address.getType() == DisturbType.DISTURB_CALL.getType() && phoneNumber.contains(address.getName())) {
-                    phoneCallManager.disconnect();
-                    String stamp = ScheduleDateUtil.stampToDate(System.currentTimeMillis(), "yyyy-MM-dd HH:mm:ss");
-                    Toast.makeText(PhoneCallActivity.this, "已拦截 \"" + phoneNumber + "\" 的来电", Toast.LENGTH_LONG).show();
-                    AppDatabase.getInstance(PhoneCallActivity.this).callLogDao()
-                            .insertAll(new CallLog(phoneNumber, "", stamp));
-                    return;
+            if (callType == PhoneCallService.CallType.CALL_IN) {
+                //优先电话拦截
+                List<Address> addressList = AppDatabase.getInstance(PhoneCallActivity.this).addressDao().getAll();
+                for (Address address : addressList) {
+                    if (address.getType() == DisturbType.DISTURB_CALL.getType() && phoneNumber.contains(address.getName())) {
+                        phoneCallManager.disconnect();
+                        String stamp = ScheduleDateUtil.stampToDate(System.currentTimeMillis(), "yyyy-MM-dd HH:mm:ss");
+                        Toast.makeText(PhoneCallActivity.this, "已拦截 \"" + phoneNumber + "\" 的来电", Toast.LENGTH_LONG).show();
+                        AppDatabase.getInstance(PhoneCallActivity.this).callLogDao()
+                                .insertAll(new CallLog(phoneNumber, "", stamp));
+                        return;
+                    }
                 }
-            }
 
-            //然后进行归属地拦截
-            getPhoneAddressService.getUsers(phoneNumber)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .compose(this.bindToLifecycle())
-                    .subscribe(new Consumer<CallAddress>() {
+                //然后进行归属地拦截
+                getPhoneAddressService.getUsers(phoneNumber)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .compose(this.bindToLifecycle())
+                        .subscribe(new Consumer<CallAddress>() {
 
-                        @Override
-                        public void accept(CallAddress callAddress) throws Exception {
-                            String att = callAddress.getResult().getAtt();
-                            String phone = callAddress.getResult().getPhone();
-                            tvCallAddress.setText(att == null ? "查询归属地失败" : att);
-                            if (callType == PhoneCallService.CallType.CALL_OUT) {
-                                return;
-                            }
-                            List<Address> addressList = AppDatabase.getInstance(PhoneCallActivity.this).addressDao().getAll();
-                            for (Address disturbAddress : addressList) {
-                                if (disturbAddress.getType() == DisturbType.DISTURB_ADDRESS.getType() && att.contains(disturbAddress.getName())) {
-                                    phoneCallManager.disconnect();
-                                    String stamp = ScheduleDateUtil.stampToDate(System.currentTimeMillis(), "yyyy-MM-dd HH:mm:ss");
-                                    Toast.makeText(PhoneCallActivity.this, "已拦截 \"" + disturbAddress.getName() + "\" 的来电", Toast.LENGTH_LONG).show();
-                                    AppDatabase.getInstance(PhoneCallActivity.this).callLogDao()
-                                            .insertAll(new CallLog(phone, att, stamp));
+                            @Override
+                            public void accept(CallAddress callAddress) throws Exception {
+                                String att = callAddress.getResult().getAtt();
+                                String phone = callAddress.getResult().getPhone();
+                                tvCallAddress.setText(att == null ? "查询归属地失败" : att);
+                                if (callType == PhoneCallService.CallType.CALL_OUT) {
                                     return;
                                 }
+                                List<Address> addressList = AppDatabase.getInstance(PhoneCallActivity.this).addressDao().getAll();
+                                for (Address disturbAddress : addressList) {
+                                    if (disturbAddress.getType() == DisturbType.DISTURB_ADDRESS.getType() && att.contains(disturbAddress.getName())) {
+                                        phoneCallManager.disconnect();
+                                        String stamp = ScheduleDateUtil.stampToDate(System.currentTimeMillis(), "yyyy-MM-dd HH:mm:ss");
+                                        Toast.makeText(PhoneCallActivity.this, "已拦截 \"" + disturbAddress.getName() + "\" 的来电", Toast.LENGTH_LONG).show();
+                                        AppDatabase.getInstance(PhoneCallActivity.this).callLogDao()
+                                                .insertAll(new CallLog(phone, att, stamp));
+                                        return;
+                                    }
+                                }
                             }
-                        }
-                    });
+                        });
+            }
         } else {
             finish();
         }
+
     }
 
     private void initView() {
