@@ -7,6 +7,8 @@ import android.media.AudioManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
@@ -15,14 +17,17 @@ import android.widget.Toast;
 
 import com.ajiew.phonecallapp.ActivityStack;
 import com.ajiew.phonecallapp.Event;
+import com.ajiew.phonecallapp.NumberUtil;
 import com.ajiew.phonecallapp.R;
 import com.ajiew.phonecallapp.ScheduleDateUtil;
 import com.ajiew.phonecallapp.db.Address;
 import com.ajiew.phonecallapp.db.AppDatabase;
 import com.ajiew.phonecallapp.db.CallLog;
 import com.ajiew.phonecallapp.db.DisturbType;
-import com.ajiew.phonecallapp.net.CallAddress;
+import com.ajiew.phonecallapp.net.AreaCallAddress;
+import com.ajiew.phonecallapp.net.GetCallAddressService;
 import com.ajiew.phonecallapp.net.GetPhoneAddressService;
+import com.ajiew.phonecallapp.net.PhoneAddress;
 import com.ajiew.phonecallapp.service.PhoneCallManager;
 import com.ajiew.phonecallapp.service.PhoneCallService;
 import com.bumptech.glide.Glide;
@@ -39,9 +44,11 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import jp.wasabeef.glide.transformations.BlurTransformation;
+import me.jessyan.rxerrorhandler.core.RxErrorHandler;
+import me.jessyan.rxerrorhandler.handler.ErrorHandleSubscriber;
+import me.jessyan.rxerrorhandler.handler.listener.ResponseErrorListener;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
@@ -58,6 +65,7 @@ import static com.ajiew.phonecallapp.service.CallListenerService.formatPhoneNumb
 @RequiresApi(api = Build.VERSION_CODES.M)
 public class PhoneCallActivity extends RxAppCompatActivity implements View.OnClickListener {
 
+    private static final String TAG = PhoneCallActivity.class.getSimpleName();
     private TextView tvCallNumberLabel;
     private TextView tvCallNumber;
     private TextView tvCallAddress;
@@ -75,6 +83,15 @@ public class PhoneCallActivity extends RxAppCompatActivity implements View.OnCli
     private TextView speakerOff;
     private int currVolume;
     private GetPhoneAddressService getPhoneAddressService;
+    private GetCallAddressService getCallAddressService;
+    private RxErrorHandler rxErrorHandler = RxErrorHandler.builder().with(this)
+            .responseErrorListener(new ResponseErrorListener() {
+                @Override
+                public void handleResponseError(Context context, Throwable t) {
+                    Log.d(TAG, "handleResponseError: " + t.toString());
+                }
+
+            }).build();
 
 
     public static void actionStart(Context context, String phoneNumber,
@@ -91,12 +108,13 @@ public class PhoneCallActivity extends RxAppCompatActivity implements View.OnCli
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_phone_call);
         ActivityStack.getInstance().addActivity(this);
-        initData();
         initView();
+        initData();
         EventBus.getDefault().register(this);
     }
 
     private void initData() {
+
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
                 .addInterceptor(new ChuckInterceptor(this))
                 .build();
@@ -107,12 +125,30 @@ public class PhoneCallActivity extends RxAppCompatActivity implements View.OnCli
                 .client(okHttpClient)
                 .build();
         getPhoneAddressService = retrofit.create(GetPhoneAddressService.class);
+        getCallAddressService = retrofit.create(GetCallAddressService.class);
 
         phoneCallManager = new PhoneCallManager(this);
         onGoingCallTimer = new Timer();
         if (getIntent() != null) {
             phoneNumber = getIntent().getStringExtra(Intent.EXTRA_PHONE_NUMBER);
             callType = (PhoneCallService.CallType) getIntent().getSerializableExtra(Intent.EXTRA_MIME_TYPES);
+
+            tvCallNumber.setText(formatPhoneNumber(phoneNumber));
+            // 打进的电话
+            if (callType == PhoneCallService.CallType.CALL_IN) {
+                tvCallNumberLabel.setText("来电号码");
+                tvPickUp.setVisibility(View.VISIBLE);
+            }
+            // 打出的电话
+            else if (callType == PhoneCallService.CallType.CALL_OUT) {
+                tvCallNumberLabel.setText("呼叫号码");
+                tvPickUp.setVisibility(View.GONE);
+                speakerOn.setVisibility(View.VISIBLE);
+                speakerOff.setVisibility(View.GONE);
+            }
+
+
+            //1 先判断来电的话 进行一下黑名单拦截
             if (callType == PhoneCallService.CallType.CALL_IN) {
                 //优先电话拦截
                 List<Address> addressList = AppDatabase.getInstance(PhoneCallActivity.this).addressDao().getAll();
@@ -126,39 +162,106 @@ public class PhoneCallActivity extends RxAppCompatActivity implements View.OnCli
                         return;
                     }
                 }
-
-                //然后进行归属地拦截
-                getPhoneAddressService.getUsers(phoneNumber)
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .compose(this.bindToLifecycle())
-                        .subscribe(new Consumer<CallAddress>() {
-
-                            @Override
-                            public void accept(CallAddress callAddress) throws Exception {
-                                String att = callAddress.getResult().getAtt();
-                                String phone = callAddress.getResult().getPhone();
-                                tvCallAddress.setText(att == null ? "查询归属地失败" : att);
-                                if (callType == PhoneCallService.CallType.CALL_OUT) {
-                                    return;
-                                }
-                                List<Address> addressList = AppDatabase.getInstance(PhoneCallActivity.this).addressDao().getAll();
-                                for (Address disturbAddress : addressList) {
-                                    if (disturbAddress.getType() == DisturbType.DISTURB_ADDRESS.getType() && att.contains(disturbAddress.getName())) {
-                                        phoneCallManager.disconnect();
-                                        String stamp = ScheduleDateUtil.stampToDate(System.currentTimeMillis(), "yyyy-MM-dd HH:mm:ss");
-                                        Toast.makeText(PhoneCallActivity.this, "已拦截 \"" + disturbAddress.getName() + "\" 的来电", Toast.LENGTH_LONG).show();
-                                        AppDatabase.getInstance(PhoneCallActivity.this).callLogDao()
-                                                .insertAll(new CallLog(phone, att, stamp));
-                                        return;
-                                    }
-                                }
-                            }
-                        });
             }
+
+
+            //2 然后去查询归属地
+            if (NumberUtil.isCellPhone(phoneNumber)) {
+            //查询手机归属地
+            cellPhoneDisturb();
+            } else if (NumberUtil.isFixedPhone(phoneNumber)) {
+                //查询区号归属地
+                NumberUtil.Number number = NumberUtil.checkNumber(phoneNumber);
+                areaCallDisturb(number.getCode());
+            } else{
+                tvCallAddress.setText("暂不支持查询");
+            }
+
+
         } else {
+            //没有数据 结束页面
             finish();
         }
+
+    }
+
+    private void areaCallDisturb(String area) {
+        getCallAddressService.getResult(area)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .compose(this.bindToLifecycle())
+                .subscribe(new ErrorHandleSubscriber<AreaCallAddress>(rxErrorHandler) {
+                    @Override
+                    public void onNext(AreaCallAddress result) {
+                        if (result.getSuccess().equals("0")) {
+                            tvCallAddress.setText("查询归属地失败");
+                            return;
+                        }
+                        AreaCallAddress.ResultBean.ListsBean listsBean = result.getResult().getLists().get(0);
+                        if (listsBean != null && !TextUtils.isEmpty(listsBean.getSimcall())) {
+                            //查询到了区号归属地
+                            tvCallAddress.setText(listsBean.getSimcall());
+                        } else {
+                            tvCallAddress.setText("查询归属地失败");
+                        }
+
+                        //设置好文字 判断是否是去电, 是的话, 直接返回
+                        if (callType == PhoneCallService.CallType.CALL_OUT) {
+                            //去电的话, 直接返回
+                            return;
+                        }
+
+                        //不是的话  进行拦截逻辑
+                        List<Address> addressList = AppDatabase.getInstance(PhoneCallActivity.this).addressDao().getAll();
+                        for (Address disturbAddress : addressList) {
+                            if (disturbAddress.getType() == DisturbType.DISTURB_ADDRESS.getType() && listsBean.getSimcall().contains(disturbAddress.getName())) {
+                                phoneCallManager.disconnect();
+                                String stamp = ScheduleDateUtil.stampToDate(System.currentTimeMillis(), "yyyy-MM-dd HH:mm:ss");
+                                Toast.makeText(PhoneCallActivity.this, "已拦截 \"" + disturbAddress.getName() + "\" 的来电", Toast.LENGTH_LONG).show();
+                                AppDatabase.getInstance(PhoneCallActivity.this).callLogDao()
+                                        .insertAll(new CallLog(phoneNumber, listsBean.getSimcall(), stamp));
+                                return;
+                            }
+                        }
+                    }
+                });
+    }
+
+    private void cellPhoneDisturb() {
+
+        getPhoneAddressService.getResult(phoneNumber)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .compose(this.bindToLifecycle())
+                .subscribe(new ErrorHandleSubscriber<PhoneAddress>(rxErrorHandler) {
+                    @Override
+                    public void onNext(PhoneAddress phoneAddress) {
+                        if (phoneAddress.getSuccess().equals("0")) {
+                            tvCallAddress.setText("查询归属地失败");
+                            return;
+                        }
+                        String att = phoneAddress.getResult().getAtt();
+                        String phone = phoneAddress.getResult().getPhone();
+                        tvCallAddress.setText(att == null ? "查询归属地失败" : att);
+                        if (callType == PhoneCallService.CallType.CALL_OUT) {
+                            //去电的话, 直接返回
+                            return;
+                        }
+
+                        //来电则判断是否拦截该手机号
+                        List<Address> addressList = AppDatabase.getInstance(PhoneCallActivity.this).addressDao().getAll();
+                        for (Address disturbAddress : addressList) {
+                            if (disturbAddress.getType() == DisturbType.DISTURB_ADDRESS.getType() && att.contains(disturbAddress.getName())) {
+                                phoneCallManager.disconnect();
+                                String stamp = ScheduleDateUtil.stampToDate(System.currentTimeMillis(), "yyyy-MM-dd HH:mm:ss");
+                                Toast.makeText(PhoneCallActivity.this, "已拦截 \"" + disturbAddress.getName() + "\" 的来电", Toast.LENGTH_LONG).show();
+                                AppDatabase.getInstance(PhoneCallActivity.this).callLogDao()
+                                        .insertAll(new CallLog(phone, att, stamp));
+                                return;
+                            }
+                        }
+                    }
+                });
 
     }
 
@@ -185,24 +288,10 @@ public class PhoneCallActivity extends RxAppCompatActivity implements View.OnCli
                 .into(img_bg);
 
 
-        tvCallNumber.setText(formatPhoneNumber(phoneNumber));
         tvPickUp.setOnClickListener(this);
         tvHangUp.setOnClickListener(this);
         speakerOn.setOnClickListener(this);
         speakerOff.setOnClickListener(this);
-
-        // 打进的电话
-        if (callType == PhoneCallService.CallType.CALL_IN) {
-            tvCallNumberLabel.setText("来电号码");
-            tvPickUp.setVisibility(View.VISIBLE);
-        }
-        // 打出的电话
-        else if (callType == PhoneCallService.CallType.CALL_OUT) {
-            tvCallNumberLabel.setText("呼叫号码");
-            tvPickUp.setVisibility(View.GONE);
-            speakerOn.setVisibility(View.VISIBLE);
-            speakerOff.setVisibility(View.GONE);
-        }
         showOnLockScreen();
     }
 

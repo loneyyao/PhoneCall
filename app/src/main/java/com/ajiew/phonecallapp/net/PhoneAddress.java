@@ -1,6 +1,6 @@
 package com.ajiew.phonecallapp.net;
 
-public class CallAddress {
+public class PhoneAddress {
 
     /**
      * success : 1
