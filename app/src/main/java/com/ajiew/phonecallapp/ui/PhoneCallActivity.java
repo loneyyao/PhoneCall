@@ -132,7 +132,7 @@ public class PhoneCallActivity extends RxAppCompatActivity implements View.OnCli
         if (getIntent() != null) {
             phoneNumber = getIntent().getStringExtra(Intent.EXTRA_PHONE_NUMBER);
             callType = (PhoneCallService.CallType) getIntent().getSerializableExtra(Intent.EXTRA_MIME_TYPES);
-
+            Log.e(TAG, "initData: " + phoneNumber + "-----"+callType);
             tvCallNumber.setText(formatPhoneNumber(phoneNumber));
             // 打进的电话
             if (callType == PhoneCallService.CallType.CALL_IN) {
@@ -167,13 +167,13 @@ public class PhoneCallActivity extends RxAppCompatActivity implements View.OnCli
 
             //2 然后去查询归属地
             if (NumberUtil.isCellPhone(phoneNumber)) {
-            //查询手机归属地
-            cellPhoneDisturb();
+                //查询手机归属地
+                cellPhoneDisturb();
             } else if (NumberUtil.isFixedPhone(phoneNumber)) {
                 //查询区号归属地
                 NumberUtil.Number number = NumberUtil.checkNumber(phoneNumber);
                 areaCallDisturb(number.getCode());
-            } else{
+            } else {
                 tvCallAddress.setText("暂不支持查询");
             }
 
@@ -406,5 +406,9 @@ public class PhoneCallActivity extends RxAppCompatActivity implements View.OnCli
             e.printStackTrace();
         }
         //Toast.makeText(context,"扬声器已经关闭",Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onBackPressed() {
     }
 }

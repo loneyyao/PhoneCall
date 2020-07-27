@@ -1,5 +1,6 @@
 package com.ajiew.phonecallapp.service;
 
+import android.content.Intent;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.telecom.Call;
@@ -33,6 +34,7 @@ public class PhoneCallService extends InCallService {
         @Override
         public void onStateChanged(Call call, int state) {
             super.onStateChanged(call, state);
+            Log.d(TAG, "onStateChanged: callState---" + call.getState());
 
             switch (state) {
                 case Call.STATE_ACTIVE: {
@@ -50,6 +52,11 @@ public class PhoneCallService extends InCallService {
     };
 
     @Override
+    public void onTaskRemoved(Intent rootIntent) {
+        super.onTaskRemoved(rootIntent);
+    }
+
+    @Override
     public void onCallAdded(Call call) {
         super.onCallAdded(call);
 
@@ -57,7 +64,7 @@ public class PhoneCallService extends InCallService {
         PhoneCallManager.call = call;
 
         CallType callType = null;
-        Log.d(TAG, "onCallAdded: callState" + call.getState());
+        Log.d(TAG, "onCallAdded: callState---" + call.getState());
         switch (call.getState()) {
             case Call.STATE_RINGING:
                 callType = CallType.CALL_IN;
@@ -71,7 +78,11 @@ public class PhoneCallService extends InCallService {
         if (callType != null) {
             Call.Details details = call.getDetails();
             String phoneNumber = details.getHandle().getSchemeSpecificPart();
-            PhoneCallActivity.actionStart(this, phoneNumber, callType);
+            Intent intent = new Intent(this, PhoneCallActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.putExtra(Intent.EXTRA_MIME_TYPES, callType);
+            intent.putExtra(Intent.EXTRA_PHONE_NUMBER, phoneNumber);
+            this.startActivity(intent);
         }
     }
 

@@ -1,5 +1,6 @@
 package com.ajiew.phonecallapp.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -11,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
+import com.ajiew.phonecallapp.ActivityStack;
 import com.ajiew.phonecallapp.widget.NoScrollViewPager;
 import com.ajiew.phonecallapp.R;
 import com.ajiew.phonecallapp.widget.TabIndicatorItemView;
@@ -42,6 +44,16 @@ public class MainActivity_new extends AppCompatActivity {
         setContentView(R.layout.activity_main_page);
         ButterKnife.bind(this);
         initView();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (ActivityStack.getInstance().getTopActivity() != null && ActivityStack.getInstance().getTopActivity() instanceof PhoneCallActivity) {
+            Intent intent = new Intent(this, PhoneCallActivity.class);
+            startActivity(intent);
+        }
     }
 
     private void initView() {
