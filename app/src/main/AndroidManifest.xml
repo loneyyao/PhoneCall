@@ -29,7 +29,8 @@
 
         <activity
             android:name=".ui.PhoneCallActivity"
-            android:launchMode="singleInstance">
+            android:launchMode="singleInstance"
+            android:excludeFromRecents="true">
             <!-- region provides ongoing call UI -->
             <intent-filter>
                 <action android:name="android.intent.action.DIAL" />
